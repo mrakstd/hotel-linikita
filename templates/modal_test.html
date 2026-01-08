@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест модального окна</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Тест модального окна создания задач</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Кнопки для тестирования</h2>
+            
+            <div class="space-y-4">
+                <button type="button" id="testBtn1" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
+                    <i class="fas fa-plus mr-2"></i>Тест кнопка 1
+                </button>
+                
+                <button type="button" id="testBtn2" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg">
+                    <i class="fas fa-plus mr-2"></i>Тест кнопка 2
+                </button>
+                
+                <button type="button" onclick="showTestModal()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg">
+                    <i class="fas fa-plus mr-2"></i>Тест кнопка 3 (onclick)
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4">Лог событий</h2>
+            <div id="eventLog" class="bg-gray-100 p-4 rounded-lg h-40 overflow-y-auto font-mono text-sm">
+                Лог событий появится здесь...<br>
+            </div>
+            <button type="button" onclick="clearLog()" class="mt-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                Очистить лог
+            </button>
+        </div>
+    </div>
+    
+    <!-- Test Modal -->
+    <div id="testModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" style="z-index: 9999;">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full p-6 relative">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-blue-600">Тестовое модальное окно</h3>
+                    <button type="button" id="closeTestModal" class="text-gray-500 hover:text-gray-700 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <p>Модальное окно работает правильно!</p>
+                    <p class="text-sm text-gray-600 mt-2">Это означает, что проблема не в CSS или z-index.</p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button type="button" id="closeTestModalBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('eventLog').innerHTML = 'Лог очищен...<br>';
+        }
+        
+        function showTestModal() {
+            log('showTestModal() вызвана');
+            const modal = document.getElementById('testModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                log('Модальное окно показано');
+            } else {
+                log('ОШИБКА: Модальное окно не найдено!');
+            }
+        }
+        
+        function hideTestModal() {
+            log('hideTestModal() вызвана');
+            const modal = document.getElementById('testModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                log('Модальное окно скрыто');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOM загружен');
+            
+            // Тест кнопка 1 - через addEventListener
+            const testBtn1 = document.getElementById('testBtn1');
+            if (testBtn1) {
+                log('Кнопка 1 найдена, добавляем обработчик');
+                testBtn1.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    log('Кнопка 1 нажата (addEventListener)');
+                    showTestModal();
+                    return false;
+                });
+            }
+            
+            // Тест кнопка 2 - через addEventListener
+            const testBtn2 = document.getElementById('testBtn2');
+            if (testBtn2) {
+                log('Кнопка 2 найдена, добавляем обработчик');
+                testBtn2.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    log('Кнопка 2 нажата (addEventListener)');
+                    showTestModal();
+                    return false;
+                });
+            }
+            
+            // Кнопки закрытия
+            const closeBtn1 = document.getElementById('closeTestModal');
+            const closeBtn2 = document.getElementById('closeTestModalBtn');
+            
+            if (closeBtn1) {
+                closeBtn1.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    log('Кнопка закрытия (X) нажата');
+                    hideTestModal();
+                });
+            }
+            
+            if (closeBtn2) {
+                closeBtn2.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    log('Кнопка "Закрыть" нажата');
+                    hideTestModal();
+                });
+            }
+            
+            // Закрытие по клику вне модального окна
+            document.addEventListener('click', function(event) {
+                const modal = document.getElementById('testModal');
+                if (modal && event.target === modal) {
+                    log('Клик вне модального окна');
+                    hideTestModal();
+                }
+            });
+            
+            log('Все обработчики настроены');
+        });
+    </script>
+</body>
+</html>

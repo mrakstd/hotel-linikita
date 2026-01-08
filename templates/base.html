@@ -1,0 +1,182 @@
+<!-- Автор макета: Ли Никита -->
+<!-- Hotel Management System - Base Template -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Ли Никита">
+    <meta name="description" content="Цифровая система управления гостиницей">
+    <title>{% block title %}Hotel OS | Dev. Li Nikita{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#64748b',
+                        accent: '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg border-b-2 border-primary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-primary">
+                            <i class="fas fa-hotel mr-2"></i>
+                            Hotel OS
+                            <span class="text-sm text-gray-500">| Dev. Li Nikita</span>
+                        </h1>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Дашборд
+                    </a>
+                    <a href="{{ url_for('rooms') }}" class="nav-link">
+                        <i class="fas fa-bed mr-2"></i>Номера
+                    </a>
+                    <a href="{{ url_for('guests') }}" class="nav-link">
+                        <i class="fas fa-users mr-2"></i>Гости
+                    </a>
+                    <a href="{{ url_for('tasks') }}" class="nav-link">
+                        <i class="fas fa-tasks mr-2"></i>Задачи
+                    </a>
+                    <a href="{{ url_for('quality_check') }}" class="nav-link">
+                        <i class="fas fa-star mr-2"></i>Качество
+                    </a>
+                    <a href="{{ url_for('reports') }}" class="nav-link">
+                        <i class="fas fa-chart-bar mr-2"></i>Отчеты
+                    </a>
+                    <a href="#" class="nav-link" onclick="showAboutModal()">
+                        <i class="fas fa-user mr-2"></i>О разработчике
+                    </a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-500 hover:text-primary">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{{ url_for('dashboard') }}" class="mobile-nav-link">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Дашборд
+                </a>
+                <a href="{{ url_for('rooms') }}" class="mobile-nav-link">
+                    <i class="fas fa-bed mr-2"></i>Номера
+                </a>
+                <a href="{{ url_for('guests') }}" class="mobile-nav-link">
+                    <i class="fas fa-users mr-2"></i>Гости
+                </a>
+                <a href="{{ url_for('tasks') }}" class="mobile-nav-link">
+                    <i class="fas fa-tasks mr-2"></i>Задачи
+                </a>
+                <a href="{{ url_for('quality_check') }}" class="mobile-nav-link">
+                    <i class="fas fa-star mr-2"></i>Качество
+                </a>
+                <a href="{{ url_for('reports') }}" class="mobile-nav-link">
+                    <i class="fas fa-chart-bar mr-2"></i>Отчеты
+                </a>
+                <a href="#" class="mobile-nav-link" onclick="showAboutModal()">
+                    <i class="fas fa-user mr-2"></i>О разработчике
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-4 p-4 rounded-lg border-l-4 
+                        {% if category == 'success' %}bg-green-50 border-green-400 text-green-700
+                        {% elif category == 'error' %}bg-red-50 border-red-400 text-red-700
+                        {% else %}bg-blue-50 border-blue-400 text-blue-700{% endif %}">
+                        <i class="fas fa-info-circle mr-2"></i>{{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-sm">
+                        © 2024 Hotel Management System by 
+                        <span class="font-semibold text-accent">Li Nikita</span>
+                    </p>
+                </div>
+                <div class="flex space-x-4">
+                    <span class="text-sm text-gray-400">
+                        Цифровая автоматизация гостиничного бизнеса
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- About Developer Modal -->
+    <div id="aboutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-primary">О разработчике</h3>
+                    <button onclick="hideAboutModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user text-white text-2xl"></i>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">Ли Никита</h4>
+                    <p class="text-gray-600 mb-4">
+                        Разработчик цифровой системы управления гостиницей
+                    </p>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-700">
+                            Система создана для автоматизации процессов управления гостиницей, 
+                            контроля качества обслуживания и повышения эффективности работы персонала.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!-- Управление гостями. Dev: Ли Никита -->
+{% extends "base.html" %}
+
+{% block title %}Гости - Hotel OS | Dev. Li Nikita{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-users text-primary mr-3"></i>
+                    Управление гостями
+                </h2>
+                <p class="text-gray-600">Заселение, выселение и учет гостей</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="{{ url_for('checkin') }}" class="btn-primary">
+                    <i class="fas fa-user-plus mr-2"></i>Заселить гостя
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guests List -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Текущие гости</h3>
+        </div>
+        
+        {% if guests %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Гость
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Номер
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Заселение
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Выселение
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Действия
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for guest in guests %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ guest.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ guest.phone or 'Нет телефона' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ guest.room_number }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ guest.check_in }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ guest.check_out }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ url_for('guest_details', guest_id=guest.id) }}" 
+                               class="text-blue-600 hover:text-blue-900 mr-4">
+                                <i class="fas fa-eye mr-1"></i>Детали
+                            </a>
+                            <a href="{{ url_for('checkout', guest_id=guest.id) }}" 
+                               class="text-red-600 hover:text-red-900"
+                               onclick="return confirm('Выселить гостя?')">
+                                <i class="fas fa-sign-out-alt mr-1"></i>Выселить
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-users text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-500 text-lg">Нет активных гостей</p>
+            <a href="{{ url_for('checkin') }}" class="btn-primary mt-4 inline-flex">
+                <i class="fas fa-user-plus mr-2"></i>Заселить первого гостя
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Mobile Cards for Small Screens -->
+    <div class="md:hidden space-y-4">
+        {% for guest in guests %}
+        <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="font-semibold text-gray-900">{{ guest.name }}</h3>
+                    <p class="text-sm text-gray-600">{{ guest.phone or 'Нет телефона' }}</p>
+                </div>
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    {{ guest.room_number }}
+                </span>
+            </div>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Заселение:</span>
+                    <span>{{ guest.check_in }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Выселение:</span>
+                    <span>{{ guest.check_out }}</span>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <a href="{{ url_for('checkout', guest_id=guest.id) }}" 
+                   class="w-full btn-secondary text-red-600 hover:bg-red-50"
+                   onclick="return confirm('Выселить гостя?')">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Выселить
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

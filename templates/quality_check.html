@@ -1,0 +1,199 @@
+<!-- Контроль качества. Dev: Ли Никита -->
+{% extends "base.html" %}
+
+{% block title %}Контроль качества - Hotel OS | Dev. Li Nikita{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-star text-accent mr-3"></i>
+            Контроль качества
+        </h2>
+        <p class="text-gray-600">Проверка и оценка качества обслуживания номеров</p>
+    </div>
+
+    <!-- Quality Check Form -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Новая проверка качества</h3>
+        
+        <form method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Room Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Номер для проверки *
+                    </label>
+                    <select name="room_id" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">Выберите номер</option>
+                        {% for room in rooms %}
+                        <option value="{{ room.id }}">
+                            Номер {{ room.room_number }} ({{ room.room_type }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Inspector Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Проверяющий *
+                    </label>
+                    <input type="text" name="checked_by" required
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                           placeholder="Имя сотрудника">
+                </div>
+            </div>
+
+            <!-- Quality Scores -->
+            <div class="space-y-6">
+                <h4 class="text-lg font-semibold text-gray-900">Оценки качества (1-10 баллов)</h4>
+                
+                <!-- Cleanliness Score -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        <i class="fas fa-broom text-green-600 mr-2"></i>
+                        Чистота номера
+                    </label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" name="cleanliness_score" min="1" max="10" value="8" 
+                               class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                               oninput="updateScoreDisplay('cleanliness', this.value)">
+                        <span id="cleanliness-display" class="text-2xl font-bold text-green-600 min-w-[3rem] text-center">8</span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        Оценивается: пол, поверхности, ванная комната, постельное белье
+                    </div>
+                </div>
+
+                <!-- Amenities Score -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        <i class="fas fa-tv text-blue-600 mr-2"></i>
+                        Удобства и оснащение
+                    </label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" name="amenities_score" min="1" max="10" value="8"
+                               class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                               oninput="updateScoreDisplay('amenities', this.value)">
+                        <span id="amenities-display" class="text-2xl font-bold text-blue-600 min-w-[3rem] text-center">8</span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        Оценивается: ТВ, кондиционер, мини-бар, Wi-Fi, полотенца
+                    </div>
+                </div>
+
+                <!-- Maintenance Score -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        <i class="fas fa-wrench text-purple-600 mr-2"></i>
+                        Техническое состояние
+                    </label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" name="maintenance_score" min="1" max="10" value="8"
+                               class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                               oninput="updateScoreDisplay('maintenance', this.value)">
+                        <span id="maintenance-display" class="text-2xl font-bold text-purple-600 min-w-[3rem] text-center">8</span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        Оценивается: сантехника, электрика, мебель, двери, окна
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Дополнительные замечания
+                </label>
+                <textarea name="notes" rows="4" 
+                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="Опишите найденные проблемы или особые замечания..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" class="btn-primary w-full md:w-auto">
+                    <i class="fas fa-save mr-2"></i>Сохранить проверку
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Recent Quality Checks -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Последние проверки</h3>
+        </div>
+        
+        {% if recent_checks %}
+        <div class="divide-y divide-gray-200">
+            {% for check in recent_checks %}
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between">
+                    <div class="mb-4 md:mb-0">
+                        <h4 class="text-lg font-semibold text-gray-900">
+                            Номер {{ check.room_number }}
+                        </h4>
+                        <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                            <span>
+                                <i class="fas fa-user mr-1"></i>
+                                {{ check.checked_by }}
+                            </span>
+                            <span>
+                                <i class="fas fa-calendar mr-1"></i>
+                                {{ check.check_date[:16] }}
+                            </span>
+                        </div>
+                        {% if check.notes %}
+                        <p class="mt-2 text-sm text-gray-600">{{ check.notes }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex space-x-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">{{ check.cleanliness_score }}/10</div>
+                            <div class="text-xs text-gray-500">Чистота</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">{{ check.amenities_score }}/10</div>
+                            <div class="text-xs text-gray-500">Удобства</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600">{{ check.maintenance_score }}/10</div>
+                            <div class="text-xs text-gray-500">Техсостояние</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900">
+                                {{ (((check.cleanliness_score or 0) + (check.amenities_score or 0) + (check.maintenance_score or 0)) / 3)|format_decimal }}
+                            </div>
+                            <div class="text-xs text-gray-500">Общая</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-clipboard-check text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-500 text-lg">Нет проведенных проверок</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function updateScoreDisplay(type, value) {
+    document.getElementById(type + '-display').textContent = value;
+}
+
+// Initialize score displays
+document.addEventListener('DOMContentLoaded', function() {
+    updateScoreDisplay('cleanliness', 8);
+    updateScoreDisplay('amenities', 8);
+    updateScoreDisplay('maintenance', 8);
+});
+</script>
+{% endblock %}

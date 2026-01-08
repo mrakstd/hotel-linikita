@@ -1,0 +1,154 @@
+/* Стилевое оформление. Автор: Ли Никита */
+/* Hotel Management System - Custom Styles */
+
+/* Navigation Styles */
+.nav-link {
+    @apply text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
+}
+
+.nav-link:hover {
+    @apply bg-gray-100;
+}
+
+.mobile-nav-link {
+    @apply block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors duration-200;
+}
+
+/* Button Styles */
+.btn-primary {
+    @apply bg-primary hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center;
+}
+
+.btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center;
+}
+
+.quick-action-btn {
+    @apply text-white font-medium py-4 px-6 rounded-lg transition-all duration-200 flex flex-col items-center justify-center min-h-[100px] hover:transform hover:scale-105;
+}
+
+/* Card Animations */
+.card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105;
+}
+
+/* Status Indicators */
+.status-available {
+    @apply bg-green-100 text-green-800 border-green-200;
+}
+
+.status-occupied {
+    @apply bg-blue-100 text-blue-800 border-blue-200;
+}
+
+.status-cleaning {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+}
+
+.status-maintenance {
+    @apply bg-red-100 text-red-800 border-red-200;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .mobile-optimized {
+        @apply text-sm;
+    }
+    
+    .mobile-card {
+        @apply p-4 space-y-3;
+    }
+    
+    .mobile-button {
+        @apply w-full py-3 text-center;
+    }
+}
+
+/* Loading States */
+.loading {
+    @apply opacity-50 pointer-events-none;
+}
+
+.loading::after {
+    content: '';
+    @apply absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 50 50'%3E%3Cpath d='M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z' fill='%231e40af'%3E%3CanimateTransform attributeType='xml' attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='0.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Focus States for Accessibility */
+.focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        @apply text-black bg-white;
+    }
+    
+    .print-break {
+        page-break-after: always;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .nav-link {
+        @apply border border-transparent hover:border-gray-400;
+    }
+    
+    .btn-primary {
+        @apply border-2 border-blue-800;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

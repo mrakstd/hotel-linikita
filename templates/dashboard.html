@@ -1,0 +1,160 @@
+<!-- Панель управления. Dev: Ли Никита -->
+{% extends "base.html" %}
+
+{% block title %}Дашборд - Hotel OS | Dev. Li Nikita{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-tachometer-alt text-primary mr-3"></i>
+            Панель управления
+        </h2>
+        <p class="text-gray-600">Обзор состояния гостиницы и текущих задач</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for stat in room_stats %}
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 
+            {% if stat.status == 'available' %}border-green-500
+            {% elif stat.status == 'occupied' %}border-blue-500
+            {% elif stat.status == 'cleaning' %}border-yellow-500
+            {% else %}border-red-500{% endif %}">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                        {% if stat.status == 'available' %}Свободные
+                        {% elif stat.status == 'occupied' %}Занятые
+                        {% elif stat.status == 'cleaning' %}На уборке
+                        {% else %}На ремонте{% endif %}
+                    </p>
+                    <p class="text-3xl font-bold text-gray-900">{{ stat.count }}</p>
+                </div>
+                <div class="p-3 rounded-full 
+                    {% if stat.status == 'available' %}bg-green-100 text-green-600
+                    {% elif stat.status == 'occupied' %}bg-blue-100 text-blue-600
+                    {% elif stat.status == 'cleaning' %}bg-yellow-100 text-yellow-600
+                    {% else %}bg-red-100 text-red-600{% endif %}">
+                    <i class="fas fa-bed text-xl"></i>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Quality Metrics -->
+    {% if quality_avg %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-star text-accent mr-2"></i>
+            Показатели качества (последние 30 дней)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600 mb-2">
+                    {{ (quality_avg.cleanliness or 0)|format_decimal }}/10
+                </div>
+                <p class="text-gray-600">Чистота</p>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-green-600 h-2 rounded-full" 
+                         style="width: {{ (quality_avg.cleanliness or 0) * 10 }}%"></div>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600 mb-2">
+                    {{ (quality_avg.amenities or 0)|format_decimal }}/10
+                </div>
+                <p class="text-gray-600">Удобства</p>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-blue-600 h-2 rounded-full" 
+                         style="width: {{ (quality_avg.amenities or 0) * 10 }}%"></div>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-600 mb-2">
+                    {{ (quality_avg.maintenance or 0)|format_decimal }}/10
+                </div>
+                <p class="text-gray-600">Техническое состояние</p>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-purple-600 h-2 rounded-full" 
+                         style="width: {{ (quality_avg.maintenance or 0) * 10 }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Tasks -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-tasks text-primary mr-2"></i>
+            Последние задачи
+        </h3>
+        {% if recent_tasks %}
+        <div class="space-y-3">
+            {% for task in recent_tasks %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 rounded-full 
+                        {% if task.status == 'completed' %}bg-green-100 text-green-600
+                        {% elif task.status == 'in_progress' %}bg-yellow-100 text-yellow-600
+                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        <i class="fas fa-{% if task.task_type == 'cleaning' %}broom
+                                        {% elif task.task_type == 'maintenance' %}wrench
+                                        {% else %}clipboard-check{% endif %}"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">
+                            Номер {{ task.room_number }} - {{ task.task_type|title }}
+                        </p>
+                        <p class="text-sm text-gray-600">{{ task.description or 'Без описания' }}</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-medium
+                    {% if task.status == 'completed' %}bg-green-100 text-green-800
+                    {% elif task.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {% if task.status == 'completed' %}Выполнено
+                    {% elif task.status == 'in_progress' %}В работе
+                    {% else %}Ожидает{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+            <p>Нет активных задач</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-bolt text-accent mr-2"></i>
+            Быстрые действия
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="{{ url_for('checkin') }}" class="quick-action-btn bg-blue-500 hover:bg-blue-600">
+                <i class="fas fa-user-plus text-xl mb-2"></i>
+                <span>Заселить гостя</span>
+            </a>
+            <button class="quick-action-btn bg-green-500 hover:bg-green-600" onclick="showCheckoutModal()">
+                <i class="fas fa-user-minus text-xl mb-2"></i>
+                <span>Выселить гостя</span>
+            </button>
+            <button class="quick-action-btn bg-yellow-500 hover:bg-yellow-600" onclick="showCreateTaskModal()">
+                <i class="fas fa-broom text-xl mb-2"></i>
+                <span>Создать задачу</span>
+            </button>
+            <a href="{{ url_for('reports') }}" class="quick-action-btn bg-purple-500 hover:bg-purple-600">
+                <i class="fas fa-chart-bar text-xl mb-2"></i>
+                <span>Отчеты</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

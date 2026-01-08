@@ -1,0 +1,185 @@
+<!-- Детали гостя. Dev: Ли Никита -->
+{% extends "base.html" %}
+
+{% block title %}{{ guest.name }} - Hotel OS | Dev. Li Nikita{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-user text-primary mr-3"></i>
+                    {{ guest.name }}
+                </h2>
+                <p class="text-gray-600">Подробная информация о госте</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="{{ url_for('guests') }}" class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>Назад к списку
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guest Information -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Personal Info -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                <i class="fas fa-id-card text-primary mr-2"></i>
+                Личная информация
+            </h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Полное имя:</span>
+                    <span class="font-semibold">{{ guest.name }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Телефон:</span>
+                    <span class="font-semibold">{{ guest.phone or 'Не указан' }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Email:</span>
+                    <span class="font-semibold">{{ guest.email or 'Не указан' }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-gray-600">Статус:</span>
+                    <span class="px-3 py-1 rounded-full text-sm font-medium
+                        {% if guest.status == 'active' %}bg-green-100 text-green-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {% if guest.status == 'active' %}Активный
+                        {% else %}Выселен{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Info -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                <i class="fas fa-bed text-primary mr-2"></i>
+                Информация о номере
+            </h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Номер:</span>
+                    <span class="font-semibold text-lg">{{ guest.room_number }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Тип номера:</span>
+                    <span class="font-semibold">{{ guest.room_type }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Цена за ночь:</span>
+                    <span class="font-semibold">{{ (guest.price or 0)|format_number }} сум</span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-gray-600">Продолжительность:</span>
+                    <span class="font-semibold">{{ stay_duration }} {{ 'ночь' if stay_duration == 1 else 'ночи' if stay_duration < 5 else 'ночей' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stay Details -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            <i class="fas fa-calendar text-primary mr-2"></i>
+            Детали проживания
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-4 bg-blue-50 rounded-lg">
+                <i class="fas fa-sign-in-alt text-blue-600 text-2xl mb-2"></i>
+                <p class="text-sm text-gray-600">Дата заселения</p>
+                <p class="text-lg font-semibold text-blue-600">{{ guest.check_in }}</p>
+            </div>
+            <div class="text-center p-4 bg-red-50 rounded-lg">
+                <i class="fas fa-sign-out-alt text-red-600 text-2xl mb-2"></i>
+                <p class="text-sm text-gray-600">Дата выселения</p>
+                <p class="text-lg font-semibold text-red-600">{{ guest.check_out }}</p>
+            </div>
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+                <i class="fas fa-money-bill-wave text-green-600 text-2xl mb-2"></i>
+                <p class="text-sm text-gray-600">Общая стоимость</p>
+                <p class="text-lg font-semibold text-green-600">{{ (total_cost or 0)|format_number }} сум</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    {% if guest.status == 'active' %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            <i class="fas fa-cogs text-primary mr-2"></i>
+            Действия
+        </h3>
+        <div class="flex flex-col md:flex-row gap-4">
+            <a href="{{ url_for('checkout', guest_id=guest.id) }}" 
+               class="btn-primary flex-1 text-center"
+               onclick="return confirm('Выселить гостя {{ guest.name }}?')">
+                <i class="fas fa-sign-out-alt mr-2"></i>Выселить гостя
+            </a>
+            <button class="btn-secondary flex-1" onclick="printGuestInfo()">
+                <i class="fas fa-print mr-2"></i>Печать информации
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Timeline (placeholder for future enhancement) -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            <i class="fas fa-history text-primary mr-2"></i>
+            История пребывания
+        </h3>
+        <div class="space-y-4">
+            <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-sign-in-alt text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="font-semibold">Заселение</p>
+                    <p class="text-sm text-gray-600">{{ guest.check_in }} - Гость заселился в номер {{ guest.room_number }}</p>
+                </div>
+            </div>
+            
+            {% if guest.status == 'checked_out' %}
+            <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-sign-out-alt text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="font-semibold">Выселение</p>
+                    <p class="text-sm text-gray-600">{{ guest.check_out }} - Гость выселился</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function printGuestInfo() {
+    window.print();
+}
+</script>
+
+<style>
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+    }
+    
+    .shadow-md {
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+    }
+}
+</style>
+{% endblock %}

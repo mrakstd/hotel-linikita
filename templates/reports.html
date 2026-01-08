@@ -1,0 +1,214 @@
+<!-- Отчеты и аналитика. Dev: Ли Никита -->
+{% extends "base.html" %}
+
+{% block title %}Отчеты - Hotel OS | Dev. Li Nikita{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-chart-bar text-primary mr-3"></i>
+            Отчеты и аналитика
+        </h2>
+        <p class="text-gray-600">Статистика работы гостиницы и эффективности персонала</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Occupancy Rate -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase">Заполняемость</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ (occupancy_rate or 0)|format_decimal }}%</p>
+                </div>
+                <div class="p-3 bg-blue-100 rounded-full">
+                    <i class="fas fa-percentage text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ occupancy_rate or 0 }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Today -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase">Выручка сегодня</p>
+                    <p class="text-3xl font-bold text-green-600">{{ (revenue_today or 0)|format_number }} сум</p>
+                </div>
+                <div class="p-3 bg-green-100 rounded-full">
+                    <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Completion -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase">Выполнение задач</p>
+                    <p class="text-3xl font-bold text-yellow-600">{{ (completion_rate or 0)|format_decimal }}%</p>
+                </div>
+                <div class="p-3 bg-yellow-100 rounded-full">
+                    <i class="fas fa-tasks text-yellow-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-yellow-600 h-2 rounded-full" style="width: {{ completion_rate or 0 }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quality Score -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase">Средняя оценка</p>
+                    <p class="text-3xl font-bold text-purple-600">{{ (quality_avg or 0)|format_decimal }}/10</p>
+                </div>
+                <div class="p-3 bg-purple-100 rounded-full">
+                    <i class="fas fa-star text-purple-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-purple-600 h-2 rounded-full" style="width: {{ (quality_avg or 0) * 10 }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Check-ins -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-calendar-check text-primary mr-2"></i>
+                Последние заселения (7 дней)
+            </h3>
+        </div>
+        
+        {% if recent_checkins %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Гость</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Номер</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Дата заселения</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for checkin in recent_checkins %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-sm"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ checkin.name }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ checkin.room_number }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ checkin.check_in }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-calendar-times text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-500">Нет заселений за последние 7 дней</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Performance Insights -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Efficiency Tips -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-lightbulb text-accent mr-2"></i>
+                Рекомендации по эффективности
+            </h3>
+            <div class="space-y-3">
+                {% if (occupancy_rate or 0) < 70 %}
+                <div class="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium text-yellow-800">Низкая заполняемость</p>
+                        <p class="text-xs text-yellow-700">Рассмотрите маркетинговые акции для привлечения гостей</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if (completion_rate or 0) < 80 %}
+                <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg">
+                    <i class="fas fa-tasks text-red-600 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium text-red-800">Низкое выполнение задач</p>
+                        <p class="text-xs text-red-700">Необходимо улучшить координацию работы персонала</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if (quality_avg or 0) < 7 %}
+                <div class="flex items-start space-x-3 p-3 bg-orange-50 rounded-lg">
+                    <i class="fas fa-star text-orange-600 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium text-orange-800">Качество ниже стандарта</p>
+                        <p class="text-xs text-orange-700">Усильте контроль качества уборки и обслуживания</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if (occupancy_rate or 0) >= 70 and (completion_rate or 0) >= 80 and (quality_avg or 0) >= 7 %}
+                <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+                    <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium text-green-800">Отличная работа!</p>
+                        <p class="text-xs text-green-700">Все показатели в норме, продолжайте в том же духе</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-bolt text-primary mr-2"></i>
+                Быстрые действия
+            </h3>
+            <div class="space-y-3">
+                <a href="{{ url_for('checkin') }}" class="block w-full btn-primary text-center">
+                    <i class="fas fa-user-plus mr-2"></i>Заселить гостя
+                </a>
+                <a href="{{ url_for('tasks') }}" class="block w-full btn-secondary text-center">
+                    <i class="fas fa-tasks mr-2"></i>Управление задачами
+                </a>
+                <a href="{{ url_for('quality_check') }}" class="block w-full btn-secondary text-center">
+                    <i class="fas fa-star mr-2"></i>Проверка качества
+                </a>
+                <a href="{{ url_for('add_room') }}" class="block w-full btn-secondary text-center">
+                    <i class="fas fa-plus mr-2"></i>Добавить номер
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

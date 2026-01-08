@@ -1,0 +1,80 @@
+<!-- Редактирование номера. Dev: Ли Никита -->
+{% extends "base.html" %}
+
+{% block title %}Редактировать номер - Hotel OS | Dev. Li Nikita{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-edit text-primary mr-3"></i>
+            Редактировать номер {{ room.room_number }}
+        </h2>
+        <p class="text-gray-600">Измените информацию о номере</p>
+    </div>
+
+    <!-- Edit Room Form -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="room_number" class="block text-sm font-medium text-gray-700 mb-2">
+                        Номер комнаты *
+                    </label>
+                    <input type="text" id="room_number" name="room_number" required
+                           value="{{ room.room_number }}"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="room_type" class="block text-sm font-medium text-gray-700 mb-2">
+                        Тип номера *
+                    </label>
+                    <select id="room_type" name="room_type" required
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="Standard" {% if room.room_type == 'Standard' %}selected{% endif %}>Стандартный</option>
+                        <option value="Deluxe" {% if room.room_type == 'Deluxe' %}selected{% endif %}>Делюкс</option>
+                        <option value="Suite" {% if room.room_type == 'Suite' %}selected{% endif %}>Люкс</option>
+                        <option value="Presidential" {% if room.room_type == 'Presidential' %}selected{% endif %}>Президентский</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
+                    Цена за ночь (сум) *
+                </label>
+                <input type="number" id="price" name="price" required min="0" step="1000"
+                       value="{{ room.price|int }}"
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+
+            <!-- Current Status Info -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-900 mb-2">Текущий статус</h4>
+                <span class="px-3 py-1 rounded-full text-sm font-medium
+                    {% if room.status == 'available' %}bg-green-100 text-green-800
+                    {% elif room.status == 'occupied' %}bg-blue-100 text-blue-800
+                    {% elif room.status == 'cleaning' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-red-100 text-red-800{% endif %}">
+                    {% if room.status == 'available' %}Свободен
+                    {% elif room.status == 'occupied' %}Занят
+                    {% elif room.status == 'cleaning' %}На уборке
+                    {% else %}На ремонте{% endif %}
+                </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col md:flex-row gap-4 pt-6">
+                <button type="submit" class="btn-primary flex-1">
+                    <i class="fas fa-save mr-2"></i>Сохранить изменения
+                </button>
+                <a href="{{ url_for('rooms') }}" class="btn-secondary flex-1 text-center">
+                    <i class="fas fa-arrow-left mr-2"></i>Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
